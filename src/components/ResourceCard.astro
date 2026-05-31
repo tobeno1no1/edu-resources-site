@@ -1,0 +1,49 @@
+---
+// 资料卡片组件
+interface Props {
+  title: string;
+  grade: string;
+  subject: string;
+  brand: string;
+  type: string;
+  link: string;
+  date: string;
+  description?: string;
+  tags?: string[];
+}
+
+const { title, grade, subject, brand, type, link, date, description = '', tags = [] } = Astro.props;
+
+const subjectClass: Record<string, string> = {
+  '数学': 'math',
+  '语文': 'chinese',
+  '英语': 'english',
+  '物理': 'science',
+  '化学': 'science',
+  '生物': 'science',
+};
+const badgeClass = subjectClass[subject] || '';
+
+const gradeLabel = Number(grade) <= 6 ? `小学${grade}年级` : `初${Number(grade) - 6}年级`;
+---
+<div class="resource-card">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+    <div class="card-title">{title}</div>
+    <span class="card-date" style="flex-shrink:0;">{date}</span>
+  </div>
+  <div class="card-meta">
+    <span class={`badge ${badgeClass}`}>{subject}</span>
+    <span class="badge">{gradeLabel}</span>
+    <span class="badge">{brand}</span>
+    <span class="badge">{type}</span>
+  </div>
+  {description && <div style="font-size:13px; color:var(--color-text-secondary); line-height:1.5;">{description}</div>}
+  {tags.length > 0 && (
+    <div style="display:flex; flex-wrap:wrap; gap:4px;">
+      {tags.map(tag => <span style="font-size:12px; color:var(--color-text-muted);">#{tag}</span>)}
+    </div>
+  )}
+  <a href={link} target="_blank" rel="noopener noreferrer" class="card-download">
+    夸克网盘下载
+  </a>
+</div>

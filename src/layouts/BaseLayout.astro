@@ -1,0 +1,47 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = '小学初中教辅资料免费分享站，每日更新，涵盖语数英等各科目练习卷、知识点、真题。' } = Astro.props;
+const BASE = import.meta.env.BASE_URL;
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title} - 教辅资料站</title>
+  <link rel="icon" type="image/svg+xml" href={`${BASE}favicon.svg`} />
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header style="border-bottom: 1px solid var(--color-border); background: #fff; position: sticky; top: 0; z-index: 100;">
+    <div style="max-width: var(--max-width); margin: 0 auto; padding: 0 20px; height: var(--header-height); display: flex; align-items: center; justify-content: space-between;">
+      <a href={BASE} style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px;">
+        📚 教辅资料站
+      </a>
+      <nav style="display: flex; align-items: center; gap: 4px;">
+        <a href={BASE} class="btn" style="border: none; font-size: 14px;">首页</a>
+        <a href={`${BASE}grade/1`} class="btn" style="border: none; font-size: 14px;">按年级</a>
+        <a href={`${BASE}daily`} class="btn" style="border: none; font-size: 14px;">每日更新</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主体内容 -->
+  <main style="flex: 1; max-width: var(--max-width); margin: 0 auto; padding: 32px 20px; width: 100%;">
+    <slot />
+  </main>
+
+  <!-- 底部 -->
+  <footer style="border-top: 1px solid var(--color-border); padding: 24px 20px; text-align: center; font-size: 13px; color: var(--color-text-muted);">
+    <p>📚 教辅资料站 · 免费公益分享 · 每日更新</p>
+    <p style="margin-top: 4px;">资料来源于网络，仅供学习交流，如有版权问题请联系删除</p>
+  </footer>
+</body>
+</html>

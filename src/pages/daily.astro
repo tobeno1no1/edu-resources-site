@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = import.meta.env.BASE_URL;
+
+const allResources = await getCollection('resources');
+const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+// 按日期分组
+const byDate: Record<string, typeof sorted> = {};
+sorted.forEach(r => {
+  const d = r.data.date;
+  if (!byDate[d]) byDate[d] = [];
+  byDate[d].push(r);
+});
+
+const dateKeys = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+---
+<BaseLayout title="每日更新">
+  <div style="font-size:13px; color:var(--color-text-muted); margin-bottom:20px;">
+    <a href={BASE}>首页</a> &nbsp;/&nbsp; 每日更新
+  </div>
+
+  <h1 style="font-size:20px; font-weight:600; margin-bottom:24px;">📅 每日更新记录</h1>
+
+  {dateKeys.length > 0 ? (
+    dateKeys.map(date => (
+      <section style="margin-bottom:40px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--color-border);">
+          <h2 style="font-size:16px; font-weight:600;">{date}</h2>
+          <span style="font-size:13px; color:var(--color-text-muted);">共 {byDate[date].length} 份</span>
+        </div>
+        <div class="resource-grid">
+          {byDate[date].map(r => (
+            <ResourceCard
+              title={r.data.title}
+              grade={r.data.grade}
+              subject={r.data.subject}
+              brand={r.data.brand}
+              type={r.data.type}
+              link={r.data.link}
+              date={r.data.date}
+              description={r.data.description}
+              tags={r.data.tags}
+            />
+          ))}
+        </div>
+      </section>
+    ))
+  ) : (
+    <div class="empty-state">暂无资料记录</div>
+  )}
+</BaseLayout>

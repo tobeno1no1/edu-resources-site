@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = import.meta.env.BASE_URL;
+
+export async function getStaticPaths() {
+  return [
+    { params: { grade: '1' } },
+    { params: { grade: '2' } },
+    { params: { grade: '3' } },
+    { params: { grade: '4' } },
+    { params: { grade: '5' } },
+    { params: { grade: '6' } },
+    { params: { grade: '7' } },
+    { params: { grade: '8' } },
+    { params: { grade: '9' } },
+  ];
+}
+
+const { grade } = Astro.params;
+const gradeNum = Number(grade);
+const gradeLabel = gradeNum <= 6 ? `小学${gradeNum}年级` : `初${gradeNum - 6}年级`;
+
+const allResources = await getCollection('resources');
+const gradeResources = allResources
+  .filter(r => r.data.grade === grade)
+  .sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+// 科目列表（该年级有资料的）
+const subjects = [...new Set(gradeResources.map(r => r.data.subject))];
+
+const GRADES = [
+  { label: '一年级', value: '1' },
+  { label: '二年级', value: '2' },
+  { label: '三年级', value: '3' },
+  { label: '四年级', value: '4' },
+  { label: '五年级', value: '5' },
+  { label: '六年级', value: '6' },
+  { label: '初一', value: '7' },
+  { label: '初二', value: '8' },
+  { label: '初三', value: '9' },
+];
+---
+<BaseLayout title={gradeLabel}>
+  <!-- 面包屑 -->
+  <div style="font-size:13px; color:var(--color-text-muted); margin-bottom:20px;">
+    <a href={BASE}>首页</a> &nbsp;/&nbsp; {gradeLabel}
+  </div>
+
+  <!-- 年级切换 -->
+  <div class="filter-group" style="margin-bottom:24px;">
+    {GRADES.map(g => (
+      <a
+        href={`${BASE}grade/${g.value}`}
+        class={`filter-tag ${g.value === grade ? 'active' : ''}`}
+      >{g.label}</a>
+    ))}
+  </div>
+
+  <h1 style="font-size:20px; font-weight:600; margin-bottom:8px;">{gradeLabel} 资料</h1>
+  <p style="font-size:14px; color:var(--color-text-muted); margin-bottom:24px;">共 {gradeResources.length} 份资料</p>
+
+  {subjects.length > 0 && (
+    <div style="margin-bottom:24px;">
+      <div style="font-size:13px; color:var(--color-text-secondary); margin-bottom:8px;">按科目筛选：</div>
+      <div class="filter-group" id="subject-filters">
+        <button class="filter-tag active" data-subject="all" onclick="filterSubject('all', this)">全部</button>
+        {subjects.map(s => (
+          <button class="filter-tag" data-subject={s} onclick={`filterSubject('${s}', this)`}>{s}</button>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {gradeResources.length > 0 ? (
+    <div class="resource-grid" id="resource-list">
+      {gradeResources.map(r => (
+        <div class="resource-item" data-subject={r.data.subject}>
+          <ResourceCard
+            title={r.data.title}
+            grade={r.data.grade}
+            subject={r.data.subject}
+            brand={r.data.brand}
+            type={r.data.type}
+            link={r.data.link}
+            date={r.data.date}
+            description={r.data.description}
+            tags={r.data.tags}
+          />
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div class="empty-state">该年级暂无资料，敬请期待 ✨</div>
+  )}
+</BaseLayout>
+
+<script>
+function filterSubject(subject: string, btn: HTMLElement) {
+  // 更新按钮状态
+  document.querySelectorAll('#subject-filters .filter-tag').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // 过滤卡片
+  document.querySelectorAll<HTMLElement>('.resource-item').forEach(item => {
+    if (subject === 'all' || item.dataset.subject === subject) {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+</script>

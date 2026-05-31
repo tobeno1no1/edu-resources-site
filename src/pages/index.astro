@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = import.meta.env.BASE_URL;
+
+// 获取所有资料，按日期降序
+const allResources = await getCollection('resources');
+const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+// 最新资料（首页显示最近20条）
+const latest = sorted.slice(0, 20);
+
+// 今天的日期
+const today = new Date().toISOString().slice(0, 10);
+const todayResources = sorted.filter(r => r.data.date === today);
+
+// 统计
+const totalCount = sorted.length;
+const subjectSet = new Set(sorted.map(r => r.data.subject));
+const gradeSet = new Set(sorted.map(r => r.data.grade));
+
+// 年级列表用于导航
+const GRADES = [
+  { label: '一年级', value: '1' },
+  { label: '二年级', value: '2' },
+  { label: '三年级', value: '3' },
+  { label: '四年级', value: '4' },
+  { label: '五年级', value: '5' },
+  { label: '六年级', value: '6' },
+  { label: '初一', value: '7' },
+  { label: '初二', value: '8' },
+  { label: '初三', value: '9' },
+];
+---
+<BaseLayout title="首页">
+  <!-- Hero 区域 -->
+  <div style="text-align:center; padding: 40px 0 32px;">
+    <h1 style="font-size: 28px; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.5px;">
+      📚 小学初中教辅资料免费站
+    </h1>
+    <p style="font-size: 15px; color: var(--color-text-secondary); max-width: 500px; margin: 0 auto 24px;">
+      每日更新 · 涵盖语数英理化 · 完全免费 · 夸克网盘直链
+    </p>
+    <!-- 统计 -->
+    <div style="display:inline-flex; gap:32px; background: var(--color-bg-secondary); border-radius: var(--radius-lg); padding: 16px 32px; border: 1px solid var(--color-border);">
+      <div>
+        <div style="font-size: 24px; font-weight: 600; color: var(--color-accent);">{totalCount}</div>
+        <div style="font-size: 13px; color: var(--color-text-muted);">资料总数</div>
+      </div>
+      <div style="width:1px; background: var(--color-border);"></div>
+      <div>
+        <div style="font-size: 24px; font-weight: 600; color: var(--color-accent);">{gradeSet.size}</div>
+        <div style="font-size: 13px; color: var(--color-text-muted);">覆盖年级</div>
+      </div>
+      <div style="width:1px; background: var(--color-border);"></div>
+      <div>
+        <div style="font-size: 24px; font-weight: 600; color: var(--color-accent);">{todayResources.length}</div>
+        <div style="font-size: 13px; color: var(--color-text-muted);">今日更新</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 年级快速导航 -->
+  <section style="margin-bottom: 32px;">
+    <h2 style="font-size: 16px; font-weight: 500; margin-bottom: 12px; color: var(--color-text-secondary);">按年级浏览</h2>
+    <div class="filter-group">
+      {GRADES.map(g => (
+        <a href={`${BASE}grade/${g.value}`} class="filter-tag">{g.label}</a>
+      ))}
+    </div>
+  </section>
+
+  <!-- 今日更新 -->
+  {todayResources.length > 0 && (
+    <section style="margin-bottom: 40px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+        <h2 style="font-size:17px; font-weight:600;">🆕 今日更新</h2>
+        <span style="font-size:13px; color:var(--color-text-muted);">{today}</span>
+      </div>
+      <div class="resource-grid">
+        {todayResources.map(r => (
+          <ResourceCard
+            title={r.data.title}
+            grade={r.data.grade}
+            subject={r.data.subject}
+            brand={r.data.brand}
+            type={r.data.type}
+            link={r.data.link}
+            date={r.data.date}
+            description={r.data.description}
+            tags={r.data.tags}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- 最新资料 -->
+  <section>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+      <h2 style="font-size:17px; font-weight:600;">最新资料</h2>
+      <a href={`${BASE}daily`} style="font-size:13px; color:var(--color-accent);">查看全部 →</a>
+    </div>
+    {latest.length > 0 ? (
+      <div class="resource-grid">
+        {latest.map(r => (
+          <ResourceCard
+            title={r.data.title}
+            grade={r.data.grade}
+            subject={r.data.subject}
+            brand={r.data.brand}
+            type={r.data.type}
+            link={r.data.link}
+            date={r.data.date}
+            description={r.data.description}
+            tags={r.data.tags}
+          />
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state">暂无资料，敬请期待 ✨</div>
+    )}
+  </section>
+</BaseLayout>
