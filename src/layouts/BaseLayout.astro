@@ -27,30 +27,30 @@ const SITE_BASE = rawBase.replace(/\/$/, '');
 </head>
 <body>
   <!-- 顶部导航 -->
-  <header style="border-bottom: 1px solid var(--color-border); background: #fff; position: sticky; top: 0; z-index: 100;">
-    <div style="max-width: var(--max-width); margin: 0 auto; padding: 0 20px; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-      <a href={BASE} style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href={BASE} class="site-logo">
         📚 星辰学院教辅资料站
       </a>
 
       <!-- 搜索框 -->
-      <div style="flex: 1; max-width: 360px; position: relative;">
+      <div class="site-search">
         <input
           type="text"
           id="search-input"
+          class="site-search-input"
           placeholder="搜索资料（年级/科目/关键词）"
           autocomplete="off"
-          style="width: 100%; padding: 7px 12px 7px 32px; border: 1px solid var(--color-border-dark); border-radius: 20px; font-size: 13px; outline: none; transition: border-color 0.15s;"
         />
-        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 14px; pointer-events: none;">🔍</span>
+        <span class="site-search-icon">🔍</span>
         <!-- 搜索结果下拉框 -->
-        <div id="search-results" style="display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid var(--color-border); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-height: 480px; overflow-y: auto; z-index: 200;"></div>
+        <div id="search-results" class="site-search-results"></div>
       </div>
 
-      <nav style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-        <a href={BASE} class="btn" style="border: none; font-size: 14px;">首页</a>
-        <a href={`${BASE}grade/1`} class="btn" style="border: none; font-size: 14px;">按年级</a>
-        <a href={`${BASE}daily`} class="btn" style="border: none; font-size: 14px;">每日更新</a>
+      <nav class="site-nav">
+        <a href={BASE} class="btn">首页</a>
+        <a href={`${BASE}grade/1`} class="btn">按年级</a>
+        <a href={`${BASE}daily`} class="btn">每日更新</a>
       </nav>
     </div>
   </header>
