@@ -38,6 +38,7 @@ const dateKeys = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
         <div class="resource-grid">
           {byDate[date].map(r => (
             <ResourceCard
+              slug={r.slug}
               title={r.data.title}
               grade={r.data.grade}
               subject={r.data.subject}

@@ -100,6 +100,8 @@ async function main() {
       date: fm.date || '',
       link: fm.link,
       tags: fm.tags || [],
+      slug: fname.replace(/\.md$/, ''),
+      cover: `/covers/${fname.replace(/\.md$/, '')}.png`,
     });
   }
 

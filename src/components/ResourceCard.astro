@@ -10,9 +10,15 @@ interface Props {
   date: string;
   description?: string;
   tags?: string[];
+  slug?: string;  // md 文件名（不含扩展名），用于查找封面图
 }
 
-const { title, grade, subject, brand, type, link, date, description = '', tags = [] } = Astro.props;
+const { title, grade, subject, brand, type, link, date, description = '', tags = [], slug = '' } = Astro.props;
+
+const BASE = (() => {
+  const b = import.meta.env.BASE_URL;
+  return b.endsWith('/') ? b : b + '/';
+})();
 
 const subjectClass: Record<string, string> = {
   '数学': 'math',
@@ -25,8 +31,18 @@ const subjectClass: Record<string, string> = {
 const badgeClass = subjectClass[subject] || '';
 
 const gradeLabel = Number(grade) <= 6 ? `小学${grade}年级` : `初${Number(grade) - 6}年级`;
+
+// 封面图路径
+const coverUrl = slug ? `${BASE}covers/${slug}.png` : '';
 ---
 <div class="resource-card">
+  {coverUrl && (
+    <a href={link} target="_blank" rel="noopener noreferrer" class="card-cover-link">
+      <div class="card-cover">
+        <img src={coverUrl} alt={title} loading="lazy" />
+      </div>
+    </a>
+  )}
   <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
     <div class="card-title">{title}</div>
     <span class="card-date" style="flex-shrink:0;">{date}</span>

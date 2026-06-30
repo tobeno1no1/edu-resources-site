@@ -104,7 +104,7 @@ const SITE_BASE = rawBase.replace(/\/$/, '');
             item.gradeLabel || '', item.date
           ].join(' ').toLowerCase();
           return haystack.includes(q);
-        }).slice(0, 20);
+        }).slice(0, 8);
       }
 
       // 渲染结果
@@ -115,13 +115,17 @@ const SITE_BASE = rawBase.replace(/\/$/, '');
           return;
         }
         const html = results.map(r => `
-          <a href="${r.link}" target="_blank" rel="noopener noreferrer" style="display: block; padding: 12px 16px; border-bottom: 1px solid var(--color-border); text-decoration: none; color: inherit; transition: background 0.12s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='#fff'">
-            <div style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; margin-bottom: 6px;">${highlight(r.title, query)}</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; color: var(--color-text-muted);">
-              <span style="background: var(--color-bg-secondary); padding: 1px 8px; border-radius: 4px;">${r.subject}</span>
-              <span style="background: var(--color-bg-secondary); padding: 1px 8px; border-radius: 4px;">${r.gradeLabel}</span>
-              <span style="background: var(--color-bg-secondary); padding: 1px 8px; border-radius: 4px;">${r.brand}</span>
-              <span>${r.type}</span>
+          <a href="${r.link}" target="_blank" rel="noopener noreferrer" style="display: flex; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--color-border); text-decoration: none; color: inherit; transition: background 0.12s; align-items: center;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='#fff'">
+            ${r.cover ? `<img src="${r.cover}" alt="" style="width: 64px; height: 45px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" loading="lazy" />` : '<div style="width: 64px; height: 45px; background: #f1f3f5; border-radius: 4px; flex-shrink: 0;"></div>'}
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 13px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${highlight(r.title, query)}</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px; font-size: 11px; color: var(--color-text-muted);">
+                <span>${r.subject}</span>
+                <span>·</span>
+                <span>${r.gradeLabel}</span>
+                <span>·</span>
+                <span>${r.type}</span>
+              </div>
             </div>
           </a>
         `).join('');

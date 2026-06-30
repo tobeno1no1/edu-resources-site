@@ -85,6 +85,7 @@ const GRADES = [
       <div class="resource-grid">
         {todayResources.map(r => (
           <ResourceCard
+            slug={r.slug}
             title={r.data.title}
             grade={r.data.grade}
             subject={r.data.subject}
@@ -110,6 +111,7 @@ const GRADES = [
       <div class="resource-grid">
         {latest.map(r => (
           <ResourceCard
+            slug={r.slug}
             title={r.data.title}
             grade={r.data.grade}
             subject={r.data.subject}

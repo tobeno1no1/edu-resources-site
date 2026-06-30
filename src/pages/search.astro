@@ -38,6 +38,7 @@ const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date
       <div class="resource-grid">
         {sorted.slice(0, 24).map(r => (
           <ResourceCard
+            slug={r.slug}
             title={r.data.title}
             grade={r.data.grade}
             subject={r.data.subject}
@@ -66,6 +67,8 @@ const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date
   date: r.data.date,
   link: r.data.link,
   tags: r.data.tags || [],
+  slug: r.slug,
+  base: (() => { const b = import.meta.env.BASE_URL; return b.endsWith('/') ? b : b + '/'; })(),
 })) }}>
   (function() {
     const input = document.getElementById('big-search-input');
@@ -76,6 +79,10 @@ const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date
       if (!q) return text;
       const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return text.replace(new RegExp(escaped, 'gi'), m => `<mark style="background:#fef08a;padding:0 2px;">${m}</mark>`);
+    }
+
+    function badgeClass(s) {
+      return s === '数学' ? 'math' : s === '语文' ? 'chinese' : s === '英语' ? 'english' : 'science';
     }
 
     function search(q) {
@@ -95,12 +102,13 @@ const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date
       } else {
         searchList.innerHTML = `<p style="font-size:14px; color:var(--color-text-secondary); margin-bottom:16px;">共找到 <strong style="color:var(--color-accent);">${results.length}</strong> 份资料</p><div class="resource-grid">${results.map(r => `
           <div class="resource-card">
+            ${r.slug ? `<a href="${r.link}" target="_blank" rel="noopener noreferrer" class="card-cover-link"><div class="card-cover"><img src="${r.base}covers/${r.slug}.png" alt="${r.title}" loading="lazy" /></div></a>` : ''}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
               <div class="card-title">${highlight(r.title, q)}</div>
               <span class="card-date" style="flex-shrink:0;">${r.date}</span>
             </div>
             <div class="card-meta">
-              <span class="badge ${r.subject === '数学' ? 'math' : r.subject === '语文' ? 'chinese' : r.subject === '英语' ? 'english' : 'science'}">${r.subject}</span>
+              <span class="badge ${badgeClass(r.subject)}">${r.subject}</span>
               <span class="badge">${r.gradeLabel}</span>
               <span class="badge">${r.brand}</span>
               <span class="badge">${r.type}</span>

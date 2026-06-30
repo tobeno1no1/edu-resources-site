@@ -92,6 +92,31 @@ a:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--color-border-dark);
 }
+.resource-card .card-cover {
+  margin: -16px -20px 4px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  aspect-ratio: 600 / 420;
+  position: relative;
+}
+.resource-card .card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.resource-card:hover .card-cover img {
+  transform: scale(1.03);
+}
+.resource-card .card-cover-link {
+  display: block;
+  text-decoration: none;
+}
+.resource-card .card-cover-link:hover {
+  text-decoration: none;
+}
 .resource-card .card-title {
   font-size: 15px;
   font-weight: 500;

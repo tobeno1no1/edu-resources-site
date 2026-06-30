@@ -82,6 +82,7 @@ const GRADES = [
       {gradeResources.map(r => (
         <div class="resource-item" data-subject={r.data.subject}>
           <ResourceCard
+            slug={r.slug}
             title={r.data.title}
             grade={r.data.grade}
             subject={r.data.subject}
