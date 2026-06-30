@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = (() => {
+  const b = import.meta.env.BASE_URL;
+  return b.endsWith('/') ? b : b + '/';
+})();
+
+const allResources = await getCollection('resources');
+const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date));
+---
+<BaseLayout title="搜索">
+  <div style="font-size:13px; color:var(--color-text-muted); margin-bottom:20px;">
+    <a href={BASE}>首页</a> &nbsp;/&nbsp; 搜索
+  </div>
+
+  <h1 style="font-size:20px; font-weight:600; margin-bottom:24px;">🔍 站内搜索</h1>
+
+  <!-- 大搜索框 -->
+  <div style="max-width: 600px; margin-bottom: 24px;">
+    <input
+      type="text"
+      id="big-search-input"
+      placeholder="输入关键词搜索（年级/科目/品牌/类型）"
+      autocomplete="off"
+      autofocus
+      style="width: 100%; padding: 12px 16px; border: 2px solid var(--color-border-dark); border-radius: 24px; font-size: 15px; outline: none; transition: border-color 0.15s;"
+    />
+  </div>
+
+  <div id="big-search-results">
+    <p style="font-size:14px; color:var(--color-text-muted); margin-bottom: 16px;">共收录 <strong style="color:var(--color-accent);">{sorted.length}</strong> 份资料 · 试试搜索 "三年级 语文"、"人教版 期中"、"初一数学" 等</p>
+
+    <!-- 默认显示所有资料（按日期倒序，分页） -->
+    <div id="default-list">
+      <div class="resource-grid">
+        {sorted.slice(0, 24).map(r => (
+          <ResourceCard
+            title={r.data.title}
+            grade={r.data.grade}
+            subject={r.data.subject}
+            brand={r.data.brand}
+            type={r.data.type}
+            link={r.data.link}
+            date={r.data.date}
+            description={r.data.description}
+            tags={r.data.tags}
+          />
+        ))}
+      </div>
+    </div>
+
+    <div id="search-list" style="display:none;"></div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ items: sorted.map(r => ({
+  title: r.data.title,
+  subject: r.data.subject,
+  brand: r.data.brand,
+  type: r.data.type,
+  grade: r.data.grade,
+  gradeLabel: (() => { const n = Number(r.data.grade); return n <= 6 ? '小学' + n + '年级' : '初' + (n - 6); })(),
+  date: r.data.date,
+  link: r.data.link,
+  tags: r.data.tags || [],
+})) }}>
+  (function() {
+    const input = document.getElementById('big-search-input');
+    const defaultList = document.getElementById('default-list');
+    const searchList = document.getElementById('search-list');
+
+    function highlight(text, q) {
+      if (!q) return text;
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return text.replace(new RegExp(escaped, 'gi'), m => `<mark style="background:#fef08a;padding:0 2px;">${m}</mark>`);
+    }
+
+    function search(q) {
+      const query = q.toLowerCase().trim();
+      if (!query) {
+        defaultList.style.display = '';
+        searchList.style.display = 'none';
+        return;
+      }
+      defaultList.style.display = 'none';
+      const results = items.filter(item => {
+        const hay = [item.title, item.subject, item.brand, item.type, item.gradeLabel, item.date, ...(item.tags || [])].join(' ').toLowerCase();
+        return hay.includes(query);
+      });
+      if (results.length === 0) {
+        searchList.innerHTML = `<div class="empty-state"><p>未找到与 "${q}" 相关的资料</p><p style="margin-top:8px; font-size:13px;">试试其他关键词</p></div>`;
+      } else {
+        searchList.innerHTML = `<p style="font-size:14px; color:var(--color-text-secondary); margin-bottom:16px;">共找到 <strong style="color:var(--color-accent);">${results.length}</strong> 份资料</p><div class="resource-grid">${results.map(r => `
+          <div class="resource-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <div class="card-title">${highlight(r.title, q)}</div>
+              <span class="card-date" style="flex-shrink:0;">${r.date}</span>
+            </div>
+            <div class="card-meta">
+              <span class="badge ${r.subject === '数学' ? 'math' : r.subject === '语文' ? 'chinese' : r.subject === '英语' ? 'english' : 'science'}">${r.subject}</span>
+              <span class="badge">${r.gradeLabel}</span>
+              <span class="badge">${r.brand}</span>
+              <span class="badge">${r.type}</span>
+            </div>
+            <a href="${r.link}" target="_blank" rel="noopener noreferrer" class="card-download">下载资料</a>
+          </div>
+        `).join('')}</div>`;
+      }
+      searchList.style.display = '';
+    }
+
+    input.addEventListener('input', e => search(e.target.value));
+
+    // 自动从 URL ?q= 读取
+    const urlQ = new URLSearchParams(location.search).get('q');
+    if (urlQ) {
+      input.value = urlQ;
+      search(urlQ);
+    }
+
+    input.addEventListener('focus', () => { input.style.borderColor = 'var(--color-accent)'; });
+    input.addEventListener('blur', () => { input.style.borderColor = 'var(--color-border-dark)'; });
+  })();
+</script>

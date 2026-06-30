@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate search index
+        run: node scripts/generate_search_index.mjs
+
       - name: Build with Astro
         run: npm run build
 
