@@ -69,9 +69,9 @@ const GRADES = [
     <div style="margin-bottom:24px;">
       <div style="font-size:13px; color:var(--color-text-secondary); margin-bottom:8px;">按科目筛选：</div>
       <div class="filter-group" id="subject-filters">
-        <button class="filter-tag active" data-subject="all" onclick="filterSubject('all', this)">全部</button>
+        <button class="filter-tag active" data-subject="all">全部</button>
         {subjects.map(s => (
-          <button class="filter-tag" data-subject={s} onclick={`filterSubject('${s}', this)`}>{s}</button>
+          <button class="filter-tag" data-subject={s}>{s}</button>
         ))}
       </div>
     </div>
@@ -102,13 +102,13 @@ const GRADES = [
 </BaseLayout>
 
 <script>
-function filterSubject(subject: string, btn: HTMLElement) {
+function filterSubject(subject, btn) {
   // 更新按钮状态
   document.querySelectorAll('#subject-filters .filter-tag').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
   // 过滤卡片
-  document.querySelectorAll<HTMLElement>('.resource-item').forEach(item => {
+  document.querySelectorAll('.resource-item').forEach(item => {
     if (subject === 'all' || item.dataset.subject === subject) {
       item.style.display = '';
     } else {
@@ -116,4 +116,15 @@ function filterSubject(subject: string, btn: HTMLElement) {
     }
   });
 }
+
+// 使用事件委托绑定，避免 Astro 客户端脚本模块作用域导致 onclick 找不到函数
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('subject-filters');
+  if (!container) return;
+  container.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-tag');
+    if (!btn) return;
+    filterSubject(btn.dataset.subject, btn);
+  });
+});
 </script>
