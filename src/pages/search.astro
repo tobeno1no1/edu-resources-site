@@ -77,8 +77,14 @@ const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date
 
     function highlight(text, q) {
       if (!q) return text;
-      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      return text.replace(new RegExp(escaped, 'gi'), m => `<mark style="background:#fef08a;padding:0 2px;">${m}</mark>`);
+      const terms = q.toLowerCase().trim().split(/\s+/).filter(Boolean)
+        .sort((a, b) => b.length - a.length);
+      let result = text;
+      terms.forEach(term => {
+        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        result = result.replace(new RegExp(escaped, 'gi'), m => `<mark style="background:#fef08a;padding:0 2px;">${m}</mark>`);
+      });
+      return result;
     }
 
     function badgeClass(s) {
@@ -93,9 +99,10 @@ const sorted = allResources.sort((a, b) => b.data.date.localeCompare(a.data.date
         return;
       }
       defaultList.style.display = 'none';
+      const terms = query.split(/\s+/).filter(Boolean);
       const results = items.filter(item => {
         const hay = [item.title, item.subject, item.brand, item.type, item.gradeLabel, item.date, ...(item.tags || [])].join(' ').toLowerCase();
-        return hay.includes(query);
+        return terms.every(term => hay.includes(term));
       });
       if (results.length === 0) {
         searchList.innerHTML = `<div class="empty-state"><p>未找到与 "${q}" 相关的资料</p><p style="margin-top:8px; font-size:13px;">试试其他关键词</p></div>`;

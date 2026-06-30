@@ -87,23 +87,30 @@ const SITE_BASE = rawBase.replace(/\/$/, '');
         }
       }
 
-      // 简单的高亮函数
+      // 简单的高亮函数（支持多关键词，按长度降序避免嵌套）
       function highlight(text, query) {
         if (!query) return text;
-        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return text.replace(new RegExp(escaped, 'gi'), m => `<mark style="background:#fef08a;padding:0 2px;">${m}</mark>`);
+        const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean)
+          .sort((a, b) => b.length - a.length);
+        let result = text;
+        terms.forEach(term => {
+          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          result = result.replace(new RegExp(escaped, 'gi'), m => `<mark style="background:#fef08a;padding:0 2px;">${m}</mark>`);
+        });
+        return result;
       }
 
-      // 搜索匹配函数（标题/标签/科目/品牌/类型）
+      // 搜索匹配函数（标题/标签/科目/品牌/类型，支持空格分词“与”搜索）
       function searchResources(items, query) {
         const q = query.toLowerCase().trim();
         if (!q) return [];
+        const terms = q.split(/\s+/).filter(Boolean);
         return items.filter(item => {
           const haystack = [
             item.title, item.subject, item.brand, item.type,
             item.gradeLabel || '', item.date
           ].join(' ').toLowerCase();
-          return haystack.includes(q);
+          return terms.every(term => haystack.includes(term));
         }).slice(0, 8);
       }
 
