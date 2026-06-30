@@ -3,7 +3,8 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/generate_search_index.mjs && node scripts/generate_covers.js && astro dev",
+    "prebuild": "node scripts/generate_search_index.mjs && node scripts/generate_covers.js",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

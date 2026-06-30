@@ -41,11 +41,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk fonts-noto-cjk-extra
 
-      - name: Generate search index
-        run: node scripts/generate_search_index.mjs
-
-      - name: Generate cover images
-        run: python scripts/generate_covers.py
+      - name: Generate search index and covers
+        run: npm run prebuild
 
       - name: Build with Astro
         run: npm run build
